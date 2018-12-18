@@ -1,3 +1,3 @@
 # Air Phone
 
-> Android App for Air. Kotlin + MVP + Retrofit + RxJava + Glide. Air物联网系统的Android客户端，基于Kotlin语言.
+> 基于Kotlin，移动端接收嵌入式设备发送的数据包，并通过HTTP发送到WEB服务器。
