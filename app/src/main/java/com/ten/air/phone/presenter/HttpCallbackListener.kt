@@ -1,4 +1,4 @@
-package phone.air.ten.com.air_phone.http
+package com.ten.air.phone.presenter
 
 /**
  * @description 子线程的回调接口

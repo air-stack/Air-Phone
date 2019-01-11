@@ -1,4 +1,4 @@
-package phone.air.ten.com.air_phone.home
+package com.ten.air.phone.view.activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
