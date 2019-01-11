@@ -2,15 +2,17 @@ package com.ten.air.phone.view.activity
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Message
 import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
 import com.alibaba.fastjson.JSON
+import com.ten.air.phone.R
 import com.ten.air.phone.presenter.HttpCallbackListener
 import com.ten.air.phone.presenter.HttpUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import com.ten.air.phone.model.AirRecord
 import com.ten.air.phone.model.HttpResponse
-import phone.air.ten.com.air_phone.R
+
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
@@ -21,7 +23,28 @@ class MainActivity : AppCompatActivity() {
     private var showData3: TextView? = null
     private var showData4: TextView? = null
 
-    private val handler = Handler()
+    private var airRecord: AirRecord? = null
+
+    companion object {
+        private val ERROR_MSG = "网络不通畅..."
+
+        private val INIT_TEXT = "正在获取数据中..."
+
+        /**
+         * 获取最近的数据
+         */
+        private val RECORD_URL = "http://192.168.43.74:8090/air/record/last"
+    }
+
+    private val handler = object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            when (msg!!.what) {
+                1 -> setTextContent(msg!!.obj as AirRecord?)
+                2 -> setInitText()
+            }
+
+        }
+    }
 
     private val executorService = ScheduledThreadPoolExecutor(1)
 
@@ -36,11 +59,9 @@ class MainActivity : AppCompatActivity() {
         // 每隔3s调度一次
         executorService.schedule(object : Runnable {
             override fun run() {
-                HttpUtil.sendHttpRequest(RECORD_URL, HttpCallbackListenerImpl())
-                handler.post(this)
+//                HttpUtil.sendHttpRequest(RECORD_URL, HttpCallbackListenerImpl())
             }
         }, 3000, TimeUnit.MILLISECONDS)
-
     }
 
     /**
@@ -79,13 +100,16 @@ class MainActivity : AppCompatActivity() {
     internal inner class HttpCallbackListenerImpl : HttpCallbackListener {
 
         override fun onFinish(response: String) {
+            val message = Message.obtain()
             val httpResponse = JSON.parseObject(response, HttpResponse::class.java)
             if (httpResponse.code == 0) {
-                val airRecord = JSON.parseObject(httpResponse.data, AirRecord::class.java)
-                setTextContent(airRecord)
+                airRecord = JSON.parseObject(httpResponse.data, AirRecord::class.java)
+                message.what = 1
+                message.obj = airRecord
             } else {
-                setInitText()
+                message.what = 2
             }
+            handler.sendMessage(message)
         }
 
         override fun onError(e: Exception) {
@@ -101,19 +125,7 @@ class MainActivity : AppCompatActivity() {
             setTextContent(airRecord)
         }
 
-
     }
 
-
-    companion object {
-        private val ERROR_MSG = "网络不通畅..."
-
-        private val INIT_TEXT = "正在获取数据中..."
-
-        /**
-         * 获取最近的数据
-         */
-        private val RECORD_URL = "http://192.168.43.74:8090/air/record/last"
-    }
 
 }

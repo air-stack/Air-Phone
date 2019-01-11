@@ -1,8 +1,8 @@
 package com.ten.air.phone.view.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import phone.air.ten.com.air_phone.R
+import android.support.v7.app.AppCompatActivity
+import com.ten.air.phone.R
 
 class HomeActivity : AppCompatActivity() {
 
